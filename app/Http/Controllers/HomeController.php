@@ -8,6 +8,7 @@ use App\UsersSocialAccounts;
 use App\FbPages;
 use App\FbPagesToken;
 use App\FbMessengerPersonProfile;
+use App\FbMessengerKeyWord;
 use App\FbMessengerPersistentMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -282,7 +283,7 @@ class HomeController extends Controller
         return view('customer', compact('FbMessengerPersonProfiles'));
     }
 	
-	public function feed()
+	public function feed(Request $request)
     {
 		
 		if ($request->isMethod('get')) {
@@ -313,22 +314,38 @@ class HomeController extends Controller
 		
     }
 	
-	public function history()
+	public function history(Request $request)
     {
         return view('history');
     }
 	
-	public function keyword()
+	public function keyword(Request $request)
     {
-        return view('keyword');
+		// 預設關鍵字
+		$defaultKeyWord = FbMessengerKeyWord::whereNull('deleted_at')->where('page_id', Auth::user()->nowfbpage_id)->where('defcus', 0)->get();
+		
+		// 使用者關鍵字
+		config()->set('database.connections.mysql.strict', false);
+		\DB::reconnect();
+		
+		$customKeyWord = FbMessengerKeyWord::whereNull('deleted_at')->where('page_id', Auth::user()->nowfbpage_id)->where('defcus', 1)->groupBy('mkw_response')->get();
+		
+		//now changing back the strict ON
+		config()->set('database.connections.mysql.strict', true);
+		\DB::reconnect();
+		
+		$customKeyWords = FbMessengerKeyWord::whereNull('deleted_at')->where('page_id', Auth::user()->nowfbpage_id)->where('defcus', 1)->get();
+		
+		return view('keyword', compact('defaultKeyWord', 'customKeyWord', 'customKeyWords'));
+			
     }
 	
-	public function lottery()
+	public function lottery(Request $request)
     {
         return view('lottery');
     }
 	
-	public function message()
+	public function message(Request $request)
     {
         return view('message');
     }

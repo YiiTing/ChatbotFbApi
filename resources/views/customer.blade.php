@@ -1,9 +1,7 @@
 @extends('layouts.header')
 
-<script src="{{ asset('js/jquery-3.3.1.js') }}"></script>
-<script src="{{ asset('js/customer-script.js') }}"></script>
-
 @section('content')
+	<script src="{{ asset('js/customer-script.js') }}"></script>
     <div class="alert alert-primary" role="alert" style="border-radius: 0;">
         【8/3系統公告】貼文回覆功能授權機制更新，詳細說明請<a href="#" class="alert-link">點此觀看</a>
     </div>

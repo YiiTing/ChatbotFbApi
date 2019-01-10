@@ -7,6 +7,7 @@ use App\User;
 use App\UsersSocialAccounts;
 use App\FbPagesToken;
 use App\FbMessengerPersonProfile;
+use App\FbMessengerKeyWord;
 use App\FbMessengerPersistentMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -742,7 +743,7 @@ class BotController extends Controller
 								// $error = json_decode($json['error'], true);
 								// Log::info($json['error']['message']);
 							}
-							// $this->sendTextType($sender_id, $senderMessage, $page_id);
+							$this->sendTextType($sender_id, $senderMessage, $page_id);
 							// $this->sendCardMessenger($sender_id, $page_id);
 						}
 					}
@@ -949,61 +950,92 @@ class BotController extends Controller
 			"sender_action"   => 'typing_on',
 		];
 		
-		if($senderMessage == '您好'){
-			$messageData = [
-				"messaging_type" => "RESPONSE",
-				"recipient" => [
-					"id" => $sender_id,
-				],
-				"message"   => [
-					"text" => '有什麼想詢問？',
-				],
-			];
-		}else{
-			$messageData = [
-				"messaging_type" => "MESSAGE_TAG",
-				"recipient" => [
-					"id" => $sender_id,
-				],
-				"message"   => [
-					"text" => '說出您的問題',
-				],
-				"tag" => "FEATURE_FUNCTIONALITY_UPDATE"
-			];
+		$retrunText = '說出您的問題';
+		
+		$keyWords = FbMessengerKeyWord::whereNull('deleted_at')->where('page_id', $page_id)->get();
+		if(count($keyWords) > 0){
+			
+			foreach($keyWords as $keyWord){
+				if($keyWord->match == 1){
+					if(strpos($keyWord->mkw_request, $senderMessage) !== false){
+						$retrunText = $keyWord->mkw_response;
+					}
+				}
+				if($keyWord->match == 0){
+					if(strcmp($keyWord->mkw_request, $senderMessage) == 0){
+						$retrunText = $keyWord->mkw_response;
+					}
+				}
+			}
+			
 		}
 		
+		$messageData = [
+			"messaging_type" => "RESPONSE",
+			"recipient" => [
+				"id" => $sender_id,
+			],
+			"message"   => [
+				"text" => $retrunText
+			],
+			
+		];
 		
 		$FbPagesToken = FbPagesToken::whereNull('deleted_at')->where('page_id', $page_id)->first();
 		
-		$url = 'https://graph.facebook.com/v3.1/me/messages?access_token=';
+		$url = 'https://graph.facebook.com/v3.2/me/messages?access_token=';
 		$url_finally_add_fans_token = $url.$FbPagesToken->long_provider_token;
 	
 		$ch = curl_init($url_finally_add_fans_token);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($markseen));
-        curl_exec($ch);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FAILONERROR, true);
+		$output = curl_exec($ch);
+		$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+		if($http_status != 200){
+			Log::info($output);
+		}
 		
-		$url = 'https://graph.facebook.com/v3.1/me/messages?access_token=';
+		$url = 'https://graph.facebook.com/v3.2/me/messages?access_token=';
 		$url_finally_add_fans_token = $url.$FbPagesToken->long_provider_token;
 	
 		$ch = curl_init($url_finally_add_fans_token);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($typingon));
-        curl_exec($ch);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($typingon));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FAILONERROR, true);
+		$output = curl_exec($ch);
+		$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+		if($http_status != 200){
+			Log::info($output);
+		}
 		
-		$url = 'https://graph.facebook.com/v3.1/me/messages?access_token=';
+		$url = 'https://graph.facebook.com/v3.2/me/messages?access_token=';
 		$url_finally_add_fans_token = $url.$FbPagesToken->long_provider_token;
 	
 		$ch = curl_init($url_finally_add_fans_token);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($messageData));
-        curl_exec($ch);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FAILONERROR, true);
+		$output = curl_exec($ch);
+		$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+		if($http_status != 200){
+			Log::info($output);
+		}
+		
+		Log::info('傳送完成');
+		
     }
 	
 	public function test(Request $request)

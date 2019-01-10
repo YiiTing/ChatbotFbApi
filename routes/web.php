@@ -35,7 +35,14 @@ Route::middleware(['auth', 'checkFbPage'])->group(function () {
 	Route::match(array('post'), '/customerBlock', 'FunctionController@customerBlock');
 	Route::match(array('get'), '/feed', 'HomeController@feed');
 	Route::match(array('get'), '/history', 'HomeController@history');
-	Route::match(array('get'), '/keyword', 'HomeController@keyword');
+	Route::match(array('get', 'post'), '/keyword', 'HomeController@keyword');
+	Route::match(array('post'), '/keywordDefaultAdd', 'FunctionController@keywordDefaultAdd');
+	Route::match(array('post'), '/keywordDefaultDelete', 'FunctionController@keywordDefaultDelete');
+	Route::match(array('post'), '/keywordDefaultList', 'FunctionController@keywordDefaultList');
+	Route::match(array('post'), '/keywordCustomAdd', 'FunctionController@keywordCustomAdd');
+	Route::match(array('post'), '/keywordCustomDelete', 'FunctionController@keywordCustomDelete');
+	Route::match(array('post'), '/keywordCustomSave', 'FunctionController@keywordCustomSave');
+	Route::match(array('post'), '/keywordCustomCancel', 'FunctionController@keywordCustomCancel');
 	Route::match(array('get'), '/lottery', 'HomeController@lottery');
 	Route::match(array('get'), '/message', 'HomeController@message');
 	Route::match(array('get'), '/setting', 'HomeController@setting');
