@@ -1,10 +1,10 @@
 @extends('layouts.header')
 
 @section('content')
-<link href="{{ asset('SmartWizard-master/dist/css/smart_wizard.css') }}" rel="stylesheet">
-<link href="{{ asset('SmartWizard-master/dist/css/smart_wizard_theme_dots.css') }}" rel="stylesheet">
+<link href="{{ asset('smartwizard/dist/css/smart_wizard.css') }}" rel="stylesheet">
+<link href="{{ asset('smartwizard/dist/css/smart_wizard_theme_dots.css') }}" rel="stylesheet">
 
-<script src="{{ asset('SmartWizard-master/dist/js/jquery.smartWizard.min.js') }}" defer></script>
+<script src="{{ asset('smartwizard/dist/js/jquery.smartWizard.min.js') }}" defer></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	// Initialize the showStep event

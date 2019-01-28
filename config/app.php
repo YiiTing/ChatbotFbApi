@@ -177,6 +177,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 		
+		// My service providers...
+		App\Providers\FbApiServiceProvider::class,
+		
 		// Other service providers...
 		Laravel\Socialite\SocialiteServiceProvider::class,
 

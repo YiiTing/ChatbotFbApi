@@ -72,11 +72,11 @@ class SocialAuthController extends Controller
 	
 		if ($provider == 'facebook'){
 				
-			// print_r(json_encode($providerUser['likes']['data']));die();	
+			// print_r(json_encode($providerUser));die();	
 				
 			$account = UsersSocialAccounts::whereProvider($provider)
 				->whereProviderUserId($providerUser->getId())
-				->first();
+				->first();	
 
 			if ($account) {
 				

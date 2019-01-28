@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Routing\Router;
 
+use App\Services\FbApiService;
+
 class HomeController extends Controller
 {
     /**
@@ -221,7 +223,7 @@ class HomeController extends Controller
 		FbPages::whereNull('deleted_at')
 					->where('user_id', Auth::id())
 					->where('page_id', $pageid)
-					->firstOrFail();							
+					->firstOrFail();
 		$user = User::find(Auth::id());
 		$user->nowfbpage_id = $pageid;
 		$user->save();
@@ -269,6 +271,7 @@ class HomeController extends Controller
 			
 			if($http_status == 200){
 				$page_detail = json_decode($output, true);
+				// print_r($page_detail);die();
 			}
 		}
 		
@@ -283,35 +286,21 @@ class HomeController extends Controller
         return view('customer', compact('FbMessengerPersonProfiles'));
     }
 	
-	public function feed(Request $request)
+	public function feed(Request $request, FbApiService $fbapiservice)
     {
+		$responseList = null;
 		
-		if ($request->isMethod('get')) {
-			## 取得粉絲團資訊
-			$url = 'https://graph.facebook.com/v3.1/';
-			$url_add_user_id = $url.Auth::user()->nowfbpage_id.'?fields=id,name,picture,link,is_webhooks_subscribed,access_token&access_token=';
-			$url_finally_add_user_token = $url_add_user_id.Auth::user()->UsersSocialAccounts->provider_token;
-			
-			$ch = curl_init($url_finally_add_user_token);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_FAILONERROR, true);
-			$output = curl_exec($ch);
-			$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
-			
-			$page_detail = '';
-			if($http_status == 200){
-				$page_detail = json_decode($output, true);
-			}
-			
-			
-		
-			return view('feed');
-			
+		$response = $fbapiservice->getfbapiresponse('/'.Auth::user()->nowfbpage_id.'/feed?access_token=');
+		$response = json_decode($response);
+		$responseList = $response->data;
+		while(property_exists($response->paging, 'next')){
+			$response = $fbapiservice->getpnfbapiresponse($response->paging->next);
+			$response = json_decode($response);
+			$responseList = array_merge($responseList, $response->data);
 		}
+		// print_r($responseList);die();
 		
+		return view('feed', compact('responseList'));
     }
 	
 	public function history(Request $request)
@@ -350,84 +339,30 @@ class HomeController extends Controller
         return view('message');
     }
 	
-	public function setting(Request $request)
+	public function setting(Request $request, FbApiService $fbapiservice)
     {
+		// 取得粉絲團資訊
+		$response = $fbapiservice->getfbapiresponse('/'.Auth::user()->nowfbpage_id.'?fields=id,name,picture.type(large),link,is_webhooks_subscribed&access_token=');
+		$page_detail = json_decode($response);
 		
-		if ($request->isMethod('get')) {
-			## 取得粉絲團access_token
-			$url = 'https://graph.facebook.com/v3.1/';
-			$url_add_user_id = $url.Auth::user()->nowfbpage_id.'?fields=access_token&access_token=';
-			$url_finally_add_user_token = $url_add_user_id.Auth::user()->UsersSocialAccounts->provider_token;
-			
-			$ch = curl_init($url_finally_add_user_token);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_FAILONERROR, true);
-			$output = curl_exec($ch);
-			$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
-			
-			$page_token = '';
-			if($http_status == 200){
-				$page_token = json_decode($output, true);
-			}
-			
-			## 取得粉絲團資訊
-			$url = 'https://graph.facebook.com/v3.1/';
-			$url_add_user_id = $url.Auth::user()->nowfbpage_id.'?fields=id,name,picture,link,is_webhooks_subscribed,access_token&access_token=';
-
-			$url_finally_add_user_token = $url_add_user_id.$page_token['access_token'];
-			
-			$ch = curl_init($url_finally_add_user_token);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_FAILONERROR, true);
-			$output = curl_exec($ch);
-			$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
-			
-			$page_detail = '';
-			if($http_status == 200){
-				$page_detail = json_decode($output, true);
-			}
-			
-			## 創始人
-			$creator = FbPages::whereNull('deleted_at')
-									->where('page_id', Auth::user()->nowfbpage_id)
-									->where('creator', 1)
-									->first();	
-			## 管理員名單
-			$url = 'https://graph.facebook.com/v3.1/';
-			$url_add_user_id = $url.Auth::user()->nowfbpage_id.'/roles?access_token=';
-
-			$url_finally_add_user_token = $url_add_user_id.$page_detail['access_token'];
-			
-			$ch = curl_init($url_finally_add_user_token);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_FAILONERROR, true);
-			$output = curl_exec($ch);
-			$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
-			
-			if($http_status == 200){
-				$admin_lists = json_decode($output, true);
-				$admin_lists = $admin_lists['data'];
-			}
-			// print_r($creator);die();
-			$fbMessengerPersistentMenu = FbMessengerPersistentMenu::whereNull('deleted_at')
-																	->where('page_id', Auth::user()->nowfbpage_id)
-																	->get();	
-			$countfbMessengerPersistentMenu = FbMessengerPersistentMenu::whereNull('deleted_at')
-																	->where('page_id', Auth::user()->nowfbpage_id)
-																	->where('posted', 1)
-																	->count();														
-			
-			return view('setting', compact('page_detail', 'creator', 'admin_lists', 'fbMessengerPersistentMenu', 'countfbMessengerPersistentMenu'));
-		}
+		// 創始人
+		$creator = FbPages::whereNull('deleted_at')
+								->where('page_id', Auth::user()->nowfbpage_id)
+								->where('creator', 1)
+								->first();	
+		// 管理員名單
+		$response = $fbapiservice->getfbapiresponse('/'.Auth::user()->nowfbpage_id.'/roles?access_token=');
+		$admin_lists = json_decode($response)->data;
+		
+		// print_r($creator);die();
+		$fbMessengerPersistentMenu = FbMessengerPersistentMenu::whereNull('deleted_at')
+																->where('page_id', Auth::user()->nowfbpage_id)
+																->get();	
+		$countfbMessengerPersistentMenu = FbMessengerPersistentMenu::whereNull('deleted_at')
+																->where('page_id', Auth::user()->nowfbpage_id)
+																->where('posted', 1)
+																->count();														
+		return view('setting', compact('page_detail', 'creator', 'admin_lists', 'fbMessengerPersistentMenu', 'countfbMessengerPersistentMenu'));
 			
     }
 	

@@ -1,4 +1,11 @@
 $(function(){
+	// CSRF
+	$.ajaxSetup({
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		}
+	});
+	
 	//global
 	card_text_return_id="";
 
@@ -9,21 +16,58 @@ $(function(){
 
 	$("#btn_enable_bot").click(function(){
 		bot_status_trigger(false);
-	});
-	//	
+	});	
 
 	// 使用語系
 	$("input[type='radio'][name='language']").click(function(){
 		change_language($(this).val());
 	});
-	//
 
 	//連接粉絲頁 > 解除連結
 	$("#btn_disable_link_with_post").click(function(){
-		console.log("已解除連結");
+		$.ajax({
+			type:'DELETE',
+			url:'{{ url("subscribedapps") }}',
+			data:{
+			},
+			success:function(data){
+				console.log("已解除連結");
+				location.reload();
+			},
+			error : function(jqXHR, textStatus, errorThrown){
+				console.log("已解除連結");
+				
+			}
+		});
 	});
-	//
-
+	
+	//連接粉絲頁 > 設定連結
+	$("#btnPostFbPage").click(function(){
+		$.ajax({
+			type : 'POST',
+			url : '/settingsubscribedappson',
+			data : null,
+			datatype : 'text',
+			success : function(res){
+				console.log("Log: "+ res);
+			},
+			error : function(jqXHR, textStatus, errorThrown){
+				if(jqXHR.status == 404){
+					console.log("Errors: 找不到資料");
+					console.log("Status: " + jqXHR.status);
+					console.log("TextStatus: " + textStatus);
+					console.log("ErrorThrown: " + errorThrown);
+				}
+				if(jqXHR.status == 422){
+					console.log("Errors: " + jqXHR.responseJSON.message);
+					console.log("Status: " + jqXHR.status);
+					console.log("TextStatus: " + textStatus);
+					console.log("ErrorThrown: " + errorThrown);
+				}
+			}
+		});
+	});
+	
 	//訂單查詢的開啟關閉
 	$("#btn_enable_search_order").click(function(){
 		search_order_trigger(true);
@@ -31,7 +75,6 @@ $(function(){
 	$("#btn_disable_search_order").click(function(){
 		search_order_trigger(false);
 	});
-	//
 
 	//新增功能按鈕
 	$("#open_add_func_modal").click(function(){
@@ -41,7 +84,6 @@ $(function(){
 	$("#modal_add_new_func").on('show.bs.modal', function(e){
 		console.log("初始化可用的功能列表");
 	});
-	//
 
 	//打開回答選擇modal
 	$("#choose_feed_card").click(function(){
@@ -54,7 +96,6 @@ $(function(){
 		$(card_text_return_id).text($(this).attr("card-text"));
 		$("#modal_choose_card").modal('hide');
 	});
-	//
 
 	//確定新增的功能按鈕
 	$("#btn_add_func_button").click(function(){
@@ -69,7 +110,6 @@ $(function(){
 	$(".btn_del_func").click(function(){
 		remove_function($(this).attr("func-id"));
 	});
-	//
 
 	//邀請管理員
 	$("#open_invite_admin_modal").click(function(){

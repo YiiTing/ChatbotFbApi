@@ -30,15 +30,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th>貼文：ASDASDADDADASD</th>
-                            <td>8</td>
-                            <td>8</td>
-                            <td><i class="fas fa-check-circle" style="color: #28a745;"></i></td>
-                            <td><i class="fas fa-circle" style="color: #dc3545;"></i></td>
-                            <td>2018-08-11 06:29:14</td>
-                            <td><button type="button" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button></td>
-                        </tr>
+						@if ($responseList != null)
+							@foreach ($responseList as $response)
+								<tr>
+									@if (isset($response->message))
+										<th>貼文： {{ $response->message }}</th>
+									@else
+										<th>貼文： </th>	
+									@endif
+									<td>8</td>
+									<td>8</td>
+									<td><i class="fas fa-check-circle" style="color: #28a745;"></i></td>
+									<td><i class="fas fa-circle" style="color: #dc3545;"></i></td>
+									@php
+										// 更改時區
+										date_default_timezone_set('Asia/Taipei');
+									@endphp
+									<td>{{ date('Y-m-d H:i:s', strtotime($response->created_time)) }}</td>
+									<td><button type="button" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button></td>
+								</tr>
+							@endforeach
+						@endif
                     </tbody>
                 </table>
             </div>

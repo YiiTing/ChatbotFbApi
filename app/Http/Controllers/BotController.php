@@ -400,56 +400,6 @@ class BotController extends Controller
         curl_close($ch);
     }
 	
-	
-	public function subscribedapps(Request $request)
-	{
-		## 取得粉絲團access_token
-		$url = 'https://graph.facebook.com/v3.1/';
-		$url_add_user_id = $url.Auth::user()->nowfbpage_id.'?fields=id,access_token&access_token=';
-
-		$url_finally_add_user_token = $url_add_user_id.Auth::user()->UsersSocialAccounts->provider_token;
-		
-		$ch = curl_init($url_finally_add_user_token);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$output = curl_exec($ch);
-		curl_close($ch);
-		$page_detail = json_decode($output, true);
-		
-		if ($request->isMethod('post')) {
-			
-			$url = 'https://graph.facebook.com/v3.1/'.$page_detail['id'].'/subscribed_apps?access_token=';
-			$url_finally_add_fans_token = $url.$page_detail['access_token'];
-		
-			$ch = curl_init($url_finally_add_fans_token);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, true);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			$output = json_decode( curl_exec($ch) );
-			curl_close($ch);
-			
-		}
-		
-		if ($request->isMethod('delete')) {
-			
-			$url = 'https://graph.facebook.com/v3.1/'.$page_detail['id'].'/subscribed_apps?access_token=';
-			$url_finally_add_fans_token = $url.$page_detail['access_token'];
-		
-			$ch = curl_init($url_finally_add_fans_token);
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-			curl_setopt($ch, CURLOPT_POSTFIELDS, true);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			$output = json_decode( curl_exec($ch) );
-			curl_close($ch);
-			
-		}
-
-	}
-	
 	public function deltest(Request $request)
     {
 		$url = 'https://graph.facebook.com/v3.1/243534566448762/roles?admin_id=2219392691464570&access_token=';

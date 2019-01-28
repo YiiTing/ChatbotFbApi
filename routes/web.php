@@ -44,8 +44,12 @@ Route::middleware(['auth', 'checkFbPage'])->group(function () {
 	Route::match(array('post'), '/keywordCustomSave', 'FunctionController@keywordCustomSave');
 	Route::match(array('post'), '/keywordCustomCancel', 'FunctionController@keywordCustomCancel');
 	Route::match(array('get'), '/lottery', 'HomeController@lottery');
+	Route::match(array('post'), '/lotteryCheckFeed', 'FunctionController@lotteryCheckFeed');
+	Route::match(array('post'), '/lotteryStart', 'FunctionController@lotteryStart');
+	Route::match(array('post'), '/lotteryList', 'FunctionController@lotteryList');
 	Route::match(array('get'), '/message', 'HomeController@message');
 	Route::match(array('get'), '/setting', 'HomeController@setting');
+	Route::match(array('post'), '/settingsubscribedappson ', 'FunctionController@settingsubscribedappson');
 	
 	// Broadcasting Messages
 	Route::prefix('bm')->group(function () {
@@ -59,7 +63,6 @@ Route::middleware(['auth', 'checkFbPage'])->group(function () {
 
 // Bot
 Route::prefix('bot')->group(function () {
-	Route::match(array('post', 'delete'), '/subscribedapps ', 'BotController@subscribedapps');
 	Route::match(array('get'), '/deltest ', 'BotController@deltest');
 	Route::match(array('post', 'delete'), '/persistentmenu  ', 'BotController@persistentmenu');
 	Route::match(array('post', 'delete'), '/persistentmenubtn  ', 'BotController@persistentmenubtn');

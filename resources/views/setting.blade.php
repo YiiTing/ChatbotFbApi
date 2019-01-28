@@ -1,140 +1,110 @@
 @extends('layouts.header')
 
-<script src="{{ asset('js/jquery-3.3.1.js') }}"></script>
-<script src="{{ asset('js/setting-script.js') }}"></script>
-<script>
-$(document).ready(function(){
-	$("#btnPostFbPage").click(function(){
-		$.ajax({
-			type:'POST',
-			url:'{{ url("bot/subscribedapps") }}',
-			data:{
-			},
-			success:function(data){
-				location.reload();
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				// console.log(xhr.responseText);
-			}
-		});
-    });
-    $("#btn_disable_link_with_post").click(function(){
-		$.ajax({
-			type:'DELETE',
-			url:'{{ url("bot/subscribedapps") }}',
-			data:{
-			},
-			success:function(data){
-				location.reload();
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				// console.log(xhr.responseText);
-			}
-		});
-    });
-	$("#btn_add_func_button").click(function(){
-		$.ajax({
-			type:'POST',
-			url:'{{ url("bot/persistentmenubtn") }}',
-			dataType:'text',
-			data:{
-				text_func_btn_title : $('#text_func_btn_title').val(),
-				text_func_url : $('#text_func_url').val()
-			},
-			success:function(data){
-				// console.log(data);
-				if(data){
-					location.reload();
-				}else{
-					alert('三個基本連結');
-				}
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				console.log(xhr.responseText);
-			}
-		});
-    });
-	$(".btn_del_func").click(function(){
-		$.ajax({
-			type:'DELETE',
-			url:'{{ url("bot/persistentmenubtn") }}',
-			dataType:'text',
-			data:{
-				id: this.id
-			},
-			success:function(data){
-				// console.log(data);
-				if(data){
-					location.reload();
-				}
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				console.log(xhr.responseText);
-			}
-		});
-    });
-	$("#btn_enable_search_order").click(function(){
-		$.ajax({
-			type:'POST',
-			url:'{{ url("bot/persistentmenu") }}',
-			dataType:'text',
-			data:{},
-			success:function(data){
-				console.log(data);
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				console.log(xhr.responseText);
-			}
-		});
-    });
-	$("#btn_disable_search_order").click(function(){
-		$.ajax({
-			type:'DELETE',
-			url:'{{ url("bot/persistentmenu") }}',
-			dataType:'text',
-			data:{},
-			success:function(data){
-				console.log(data);
-			},
-			error: function(xhr, ajaxOptions, thrownError) {
-				console.log(xhr.responseText);
-			}
-		});
-    });
-	
-	// $("#btnPostFbPersistent").click(function(){
-		// var fbPersistentwebtitle = [];
-		// $('.fbPersistentwebtitle').each(function(){
-			// fbPersistentwebtitle.push(this.value); 
-		// });
-		// var fbPersistentweburl = [];
-		// $('.fbPersistentweburl').each(function(){
-			// fbPersistentweburl.push(this.value); 
-		// });
-		// $.ajax({
-			// type:'POST',
-			// url:'{{ url("bot/persistentmenu") }}',
-			// dataType:'text',
-			// data:{
-				// fbPersistentwebtitle : fbPersistentwebtitle,
-				// fbPersistentweburl :　fbPersistentweburl
-			// },
-			// success:function(data){
-				// console.log(data);
-				// if(data){
-					// location.reload();
-				// }
-			// },
-			// error: function(xhr, ajaxOptions, thrownError) {
-				// console.log(xhr.responseText);
-			// }
-		// });
-    // });
-});
-
-</script>
-
 @section('content')
+	<script src="{{ asset('js/setting-script.js') }}"></script>
+	<script>
+	$(document).ready(function(){
+		$("#btn_add_func_button").click(function(){
+			$.ajax({
+				type:'POST',
+				url:'{{ url("bot/persistentmenubtn") }}',
+				dataType:'text',
+				data:{
+					text_func_btn_title : $('#text_func_btn_title').val(),
+					text_func_url : $('#text_func_url').val()
+				},
+				success:function(data){
+					// console.log(data);
+					if(data){
+						location.reload();
+					}else{
+						alert('三個基本連結');
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					console.log(xhr.responseText);
+				}
+			});
+		});
+		$(".btn_del_func").click(function(){
+			$.ajax({
+				type:'DELETE',
+				url:'{{ url("bot/persistentmenubtn") }}',
+				dataType:'text',
+				data:{
+					id: this.id
+				},
+				success:function(data){
+					// console.log(data);
+					if(data){
+						location.reload();
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					console.log(xhr.responseText);
+				}
+			});
+		});
+		$("#btn_enable_search_order").click(function(){
+			$.ajax({
+				type:'POST',
+				url:'{{ url("bot/persistentmenu") }}',
+				dataType:'text',
+				data:{},
+				success:function(data){
+					console.log(data);
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					console.log(xhr.responseText);
+				}
+			});
+		});
+		$("#btn_disable_search_order").click(function(){
+			$.ajax({
+				type:'DELETE',
+				url:'{{ url("bot/persistentmenu") }}',
+				dataType:'text',
+				data:{},
+				success:function(data){
+					console.log(data);
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					console.log(xhr.responseText);
+				}
+			});
+		});
+		
+		// $("#btnPostFbPersistent").click(function(){
+			// var fbPersistentwebtitle = [];
+			// $('.fbPersistentwebtitle').each(function(){
+				// fbPersistentwebtitle.push(this.value); 
+			// });
+			// var fbPersistentweburl = [];
+			// $('.fbPersistentweburl').each(function(){
+				// fbPersistentweburl.push(this.value); 
+			// });
+			// $.ajax({
+				// type:'POST',
+				// url:'{{ url("bot/persistentmenu") }}',
+				// dataType:'text',
+				// data:{
+					// fbPersistentwebtitle : fbPersistentwebtitle,
+					// fbPersistentweburl :　fbPersistentweburl
+				// },
+				// success:function(data){
+					// console.log(data);
+					// if(data){
+						// location.reload();
+					// }
+				// },
+				// error: function(xhr, ajaxOptions, thrownError) {
+					// console.log(xhr.responseText);
+				// }
+			// });
+		// });
+	});
+
+	</script>
     <div class="container" style="margin-top: 40px;">
         <div class="row">
             <div class="col-8">
@@ -169,12 +139,12 @@ $(document).ready(function(){
                 <div style="height: 20px;"></div>
                 <div style="display: flex;justify-content: space-between;">
                     <div>
-                        <img src="{{ $page_detail['picture']['data']['url'] }}" style="height: 100px;margin-right: 20px;">
-                        <a href="{{ $page_detail['link'] }}">{{ $page_detail['name'] }}</a>
+                        <img src="{{ $page_detail->picture->data->url }}" style="height: 100px;margin-right: 20px;">
+                        <a href="{{ $page_detail->link }}">{{ $page_detail->name }}</a>
                     </div>
                     <div style="margin: auto 0;">
                         <span>{{ Auth::user()->name }}</span>&nbsp;
-						@if ($page_detail['is_webhooks_subscribed'])
+						@if ($page_detail->is_webhooks_subscribed)
 							<button type="button" class="btn btn-danger" id="btn_disable_link_with_post">解除連結</button>
 						@else
 							<button type="button" class="btn btn-primary" id="btnPostFbPage">新增連結</button>
@@ -263,7 +233,7 @@ $(document).ready(function(){
                 <div style="display: flex;justify-content: space-between;">
                     <div>
                         <img src="{{ 'images/fb-flag.png' }}" style="height: 50px;border-radius: 50%;margin-right: 20px;display: inline-block;">
-                        <p style="margin: auto 0;display: inline-block;">{{ $admin_list['name'] }} (擁有者)</p>
+                        <p style="margin: auto 0;display: inline-block;">{{ $admin_list->name }} (擁有者)</p>
                     </div>
                     <div style="margin: auto 0;">
                         <button type="button" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i></button>
